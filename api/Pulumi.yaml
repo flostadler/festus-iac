@@ -1,0 +1,7 @@
+name: festus-iac
+runtime: nodejs
+description: Pulumi program for deploying festus
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: ""

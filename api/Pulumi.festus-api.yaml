@@ -1,0 +1,7 @@
+config:
+  festus-iac:audience:
+    secure: AAABADyy8F5/z9zMELJxtvqB9aycA1tGVwCZD/ZvmjPCfI0wjY5d0H5FIrEVGtkFg2m1rWiWy8Tv94MaE/rBaHw=
+  festus-iac:issuer:
+    secure: AAABAGWz87c+z1rYzqIub63knlqio57zt31ys8i+NyfyKOjSbJXkov8uiWxvDhQ3EvE0hHqgpK1O6Qpo/2GAijGSpHUv9ydaVIE=
+  festus-iac:jwksUri:
+    secure: AAABAAMWQ6AB9smZjRJWMk+DPcTREYCiK6mDYSEzHDUge538N1F/26+HR4CyXE38uUeW/tPF5cy3Q1Ilc71TNDKL+c3BiPLi00A/TCh6U0o5PH3LLd2JBQHuBcKnU48=

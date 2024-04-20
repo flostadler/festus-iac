@@ -1,0 +1,18 @@
+{
+    "name": "festus-iac",
+    "main": "index.ts",
+    "devDependencies": {
+        "@types/node": "^18"
+    },
+    "dependencies": {
+        "@pulumi/aws": "^6.0.0",
+        "@pulumi/aws-apigateway": "^2.0.0",
+        "@pulumi/awsx": "^2.0.2",
+        "@pulumi/pulumi": "^3.0.0",
+        "@types/auth0-js": "^9.10.1",
+        "@types/jsonwebtoken": "^8.3.2",
+        "jsonwebtoken": "^8.5.1",
+        "jwks-rsa": "^1.4.0",
+        "typescript": "^4.6.0"
+    }
+}

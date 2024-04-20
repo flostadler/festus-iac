@@ -1,0 +1,7 @@
+name: aws-oidc
+runtime: nodejs
+description: AWS OIDC setup for Pulumi ESC
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: ""
