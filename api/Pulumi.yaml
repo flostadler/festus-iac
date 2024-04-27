@@ -1,4 +1,4 @@
-name: festus-iac
+name: festus
 runtime: nodejs
 description: Pulumi program for deploying festus
 config:

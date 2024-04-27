@@ -1,17 +1,18 @@
-import * as awsx from "@pulumi/awsx/classic";
+import * as awslambda from "aws-lambda";
 import * as jwt from "jsonwebtoken";
 import * as jwksClient from "jwks-rsa";
 import * as util from "util";
 
-type AuthorizerLambda = (event: awsx.apigateway.AuthorizerEvent) => Promise<awsx.apigateway.AuthorizerResponse>
+type AuthorizerLambda = (event: awslambda.APIGatewayAuthorizerEvent) => Promise<awslambda.APIGatewayAuthorizerResult>
 type AuthParameters = {
     jwksUri: string,
     audience: string,
-    issuer: string
+    issuer: string,
+    wildCardAuth?: boolean,
   }
 
 export function authorizerLambda(params: AuthParameters): AuthorizerLambda {
-    return async (event: awsx.apigateway.AuthorizerEvent) => {
+    return async (event: awslambda.APIGatewayAuthorizerEvent) => {
         try {
             return await authenticate(event, params);
         }
@@ -30,7 +31,7 @@ export function authorizerLambda(params: AuthParameters): AuthorizerLambda {
  */
 
 // Extract and return the Bearer Token from the Lambda event parameters
-function getToken(event: awsx.apigateway.AuthorizerEvent): string {
+function getToken(event: awslambda.APIGatewayAuthorizerEvent): string {
     if (!event.type || event.type !== "TOKEN") {
         throw new Error('Expected "event.type" parameter to have value "TOKEN"');
     }
@@ -48,7 +49,7 @@ function getToken(event: awsx.apigateway.AuthorizerEvent): string {
 }
 
 // Check the Token is valid with Auth0
-async function authenticate(event: awsx.apigateway.AuthorizerEvent, params: AuthParameters): Promise<awsx.apigateway.AuthorizerResponse> {
+async function authenticate(event: awslambda.APIGatewayAuthorizerEvent, params: AuthParameters): Promise<awslambda.APIGatewayAuthorizerResult> {
     console.log(event);
     const token = getToken(event);
 
@@ -74,7 +75,34 @@ async function authenticate(event: awsx.apigateway.AuthorizerEvent, params: Auth
     if (!verifiedJWT || typeof verifiedJWT === "string" || !isVerifiedJWT(verifiedJWT)) {
         throw new Error("could not verify JWT");
     }
-    return awsx.apigateway.authorizerResponse(verifiedJWT.sub, "Allow", event.methodArn);
+
+    const methodArn = getMethodArn(event, params);
+    console.log(`Method ARN: ${methodArn}`);
+    return {
+        principalId: verifiedJWT.sub,
+        policyDocument: {
+            Version: "2012-10-17",
+            Statement: [{
+                Action: "execute-api:Invoke",
+                Effect: "Allow",
+                Resource: methodArn,
+            }],
+        },
+    };
+}
+
+function getMethodArn(event: awslambda.APIGatewayAuthorizerEvent, params: AuthParameters): string {
+    if (!event.methodArn) {
+        throw new Error('Expected "event.methodArn" parameter to be set');
+    }
+
+    if (params.wildCardAuth && params.wildCardAuth === true) {
+        // split methodarn by /
+        const arnPartials = event.methodArn.split("/");
+        return arnPartials.slice(0, 2).join("/") + "/*";
+    }
+
+    return event.methodArn;
 }
 
 interface VerifiedJWT {
